@@ -3,3 +3,4 @@ pandas
 ta-lib-bin
 matplotlib
 streamlit
+openpyxl
