@@ -24,8 +24,9 @@ def backtest_trading_strategy(symbol, start_date, end_date, daily_timeframe, wee
 
     data = pd.merge(daily_data[["Close"]], weekly_data[["SMA", "RSI"]], how="left", left_index=True, right_index=True)
 
-    data["Buy"] = (data["Close"] > data["SMA"]) & (data["RSI"] > rsi_value)
-    data["Sell"] = data["Close"] < data["SMA"]
+# Calculate Buy and Sell signals based on the provided strategy
+    data["Buy"] = (data["Close"].shift(1) < data["SMA"].shift(1)) & (data["Close"] > data["SMA"]) & (data["RSI"] > rsi_value)
+    data["Sell"] = (data["Close"].shift(1) > data["SMA"].shift(1)) & (data["Close"] < data["SMA"])
 
     position = 0
     stop_loss = 0.02
