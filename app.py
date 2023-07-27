@@ -24,9 +24,8 @@ def backtest_trading_strategy(symbol, start_date, end_date, daily_timeframe, wee
 
     data = pd.merge(daily_data[["Close"]], weekly_data[["SMA", "RSI"]], how="left", left_index=True, right_index=True)
 
-# Calculate Buy and Sell signals based on the provided strategy
-    data["Buy"] = (data["Close"].shift(1) < data["SMA"].shift(1)) & (data["Close"] > data["SMA"]) & (data["RSI"] > rsi_value)
-    data["Sell"] = (data["Close"].shift(1) > data["SMA"].shift(1)) & (data["Close"] < data["SMA"])
+    data["Buy"] = (data["Close"] > data["SMA"]) & (data["RSI"] > rsi_value)
+    data["Sell"] = data["Close"] < data["SMA"]
 
     position = 0
     stop_loss = 0.02
@@ -41,11 +40,6 @@ def backtest_trading_strategy(symbol, start_date, end_date, daily_timeframe, wee
     trade_dates = []  # List to store trade dates
     quantities = []  # List to store quantities bought
     investments = []  # List to store total amount invested in each trade
-
-    # Convert "Entry Date" and "Exit Date" to Timestamp objects for comparison
-    data["Entry Date"] = pd.to_datetime(data.index)
-    data["Exit Date"] = data["Entry Date"].shift(-1)  # Shift the dates one position forward for exit dates
-    data.loc[len(data) - 1, "Exit Date"] = pd.Timestamp(end_date)  # Assign the last row's exit date as the specified end_date
 
     for i in range(len(data)):
         if data["Buy"][i] and position == 0:
