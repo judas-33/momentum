@@ -91,22 +91,21 @@ def backtest_trading_strategy(symbol, start_date, end_date, daily_timeframe, wee
     trade_data["P&L"] = [x[2] for x in exits]
 
     # Calculate P&L in percentage and store it in the DataFrame
-    for exit_info in exits:
-        entry_date, entry_price = next((e for e in entries[::-1] if pd.Timestamp(e[0]) <= exit_info[0]), (None, None))
-        if entry_date is not None and entry_price is not None:
-            exit_date, exit_price, _ = exit_info
-            pnl = (exit_price - entry_price) / entry_price
-            trade_data.loc[trade_data["Exit Date"] == exit_date, "P&L"] = pnl
+        for exit_info in exits:
+            entry_date, entry_price = next((e for e in entries[::-1] if pd.Timestamp(e[0]).date() <= exit_info[0].date()), (None, None))
+            if entry_date is not None and entry_price is not None:
+                exit_date, exit_price, _ = exit_info
+                pnl = (exit_price - entry_price) / entry_price
+                trade_data.loc[trade_data["Exit Date"] == exit_date, "P&L"] = pnl
 
-    trade_data["P&L in %"] = trade_data["P&L"] * 100
-
-    trade_data["Entry Date"] = pd.to_datetime(trade_data["Entry Date"])
-    trade_data["Exit Date"] = pd.to_datetime(trade_data["Exit Date"])
-    trade_data["Holding Period"] = (trade_data["Exit Date"] - trade_data["Entry Date"]).dt.days
-    trade_data["Capital Used"] = investments
-    trade_data["No of Quantities"] = quantities
-    trade_data["Profit/Loss Amount"] = trade_data["No of Quantities"] * (trade_data["Exit Price"] - trade_data["Entry Price"])
-    trade_data["No of Quantities"] = trade_data["No of Quantities"].astype(int)
+        trade_data["P&L in %"] = trade_data["P&L"] * 100
+        trade_data["Entry Date"] = pd.to_datetime(trade_data["Entry Date"])
+        trade_data["Exit Date"] = pd.to_datetime(trade_data["Exit Date"])
+        trade_data["Holding Period"] = (trade_data["Exit Date"] - trade_data["Entry Date"]).dt.days
+        trade_data["Capital Used"] = investments
+        trade_data["No of Quantities"] = quantities
+        trade_data["Profit/Loss Amount"] = trade_data["No of Quantities"] * (trade_data["Exit Price"] - trade_data["Entry Price"])
+        trade_data["No of Quantities"] = trade_data["No of Quantities"].astype(int)
 
     total_trades = len(trade_data)
     success_trades = len(trade_data[trade_data["P&L"] > 0])
@@ -134,7 +133,7 @@ def main():
                 user_name = data[(data["Username"] == username_or_email_input) | (data["Email"] == username_or_email_input)]["Name"].iloc[0]
             else:
                 st.error("Invalid username/email or password. Please try again.")
-        return
+            return
 
     # Get the directory path of the current script
     script_dir = os.path.dirname(os.path.abspath(__file__))
