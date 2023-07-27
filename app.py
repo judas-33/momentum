@@ -92,7 +92,7 @@ def backtest_trading_strategy(symbol, start_date, end_date, daily_timeframe, wee
 
     # Calculate P&L in percentage and store it in the DataFrame
     for exit_info in exits:
-        entry_date, entry_price = next((e for e in entries[::-1] if e[0] <= exit_info[0]), (None, None))
+        entry_date, entry_price = next((e for e in entries[::-1] if pd.Timestamp(e[0]) <= exit_info[0]), (None, None))
         if entry_date is not None and entry_price is not None:
             exit_date, exit_price, _ = exit_info
             pnl = (exit_price - entry_price) / entry_price
