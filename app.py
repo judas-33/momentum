@@ -41,6 +41,11 @@ def backtest_trading_strategy(symbol, start_date, end_date, daily_timeframe, wee
     quantities = []  # List to store quantities bought
     investments = []  # List to store total amount invested in each trade
 
+    # Convert "Entry Date" and "Exit Date" to Timestamp objects for comparison
+    data["Entry Date"] = pd.to_datetime(data.index)
+    data["Exit Date"] = data["Entry Date"].shift(-1)  # Shift the dates one position forward for exit dates
+    data.loc[len(data) - 1, "Exit Date"] = pd.Timestamp(end_date)  # Assign the last row's exit date as the specified end_date
+
     for i in range(len(data)):
         if data["Buy"][i] and position == 0:
             position = 1
