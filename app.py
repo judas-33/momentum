@@ -75,6 +75,7 @@ def backtest_trading_strategy(symbol, start_date, end_date, daily_timeframe, wee
             capital.append(capital[-1])  # Append current capital to list
             trade_dates.append(daily_data.index[i].date())  # Add trade date to trade dates list
 
+
     # Check if the last trade is still open
     if position == 1:
         exit_price = data["Close"][-1]
@@ -135,6 +136,9 @@ def main():
             else:
                 st.error("Invalid username/email or password. Please try again.")
         return
+
+    # Define the position variable to keep track of the current open position
+    position = 0
 
     # Get the directory path of the current script
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -200,22 +204,7 @@ def main():
         unsafe_allow_html=True
     )
 
-    # Display the signal for the selected stock
-    current_signal = "No Trade"
-    if trade_data["Entry Date"].iloc[-1] == date.today():
-        if trade_data["P&L"].iloc[-1] == 0:
-            current_signal = "Hold"
-        elif trade_data["P&L"].iloc[-1] > 0:
-            current_signal = "Buy"
-        else:
-            current_signal = "Sell"
-
-    # Box container for the current signal
-    st.write(
-        f'<div style="{box_style};">Current Signal:<br><b>{current_signal}</b></div>',
-        unsafe_allow_html=True
-    )
-
+    
     # Modify DataFrame to remove time from "Entry Date" and "Exit Date" columns
     trade_data["Entry Date"] = trade_data["Entry Date"].dt.date
     trade_data["Exit Date"] = trade_data["Exit Date"].dt.date
